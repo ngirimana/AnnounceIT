@@ -1,0 +1,37 @@
+basePath: /
+host: localhost:8000
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: AnnounceIT is a solution for broadcasting agencies to receive and manage
+    announcements effectively.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: AnnounceIT API
+  version: "1.0"
+paths:
+  /message:
+    get:
+      consumes:
+      - application/json
+      description: Returns a "Hello World" message
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Show a message
+      tags:
+      - message
+schemes:
+- http
+- https
+swagger: "2.0"
