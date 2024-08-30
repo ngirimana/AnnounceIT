@@ -61,12 +61,30 @@ active,deactivated - default is pending
 
 - Flags
 
-```
-{
+```{
 “id” : Integer,
 “announcement_id” : Integer,
 “created_on” : DateTime,
 “reason” : String, // [sexist, racist,bad language, etc]
 “description” : String,
 }
+
+```
+
+### Run tests
+
+```go test -v ./...
+```
+
+Run the application
+
+```go run main.go
+```
+Run Swagger
+
+```swag init
+```
+Swagger URL
+
+```http://localhost:8080/swagger/index.html
 ```
