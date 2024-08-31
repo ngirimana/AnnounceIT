@@ -1,4 +1,54 @@
 basePath: /
+definitions:
+  models.User:
+    properties:
+      address:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: integer
+      is_admin:
+        type: boolean
+      last_name:
+        type: string
+      password:
+        type: string
+      phone_number:
+        type: string
+    type: object
+  utils.ErrorResponse:
+    properties:
+      error:
+        description: The error message
+        type: string
+    type: object
+  utils.LoginData:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  utils.LoginSuccessResponse:
+    properties:
+      message:
+        type: string
+      token:
+        type: string
+    type: object
+  utils.SignUpSuccessResponse:
+    properties:
+      message:
+        description: The success message
+        type: string
+      user:
+        allOf:
+        - $ref: '#/definitions/models.User'
+        description: The user data
+    type: object
 host: localhost:8000
 info:
   contact:
@@ -14,23 +64,70 @@ info:
   title: AnnounceIT API
   version: "1.0"
 paths:
-  /message:
-    get:
+  /users/login:
+    post:
       consumes:
       - application/json
-      description: Returns a "Hello World" message
+      description: Authenticate a user and return a JWT token
+      parameters:
+      - description: User login credentials
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/utils.LoginData'
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: User logged in successfully with JWT token
           schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Show a message
+            $ref: '#/definitions/utils.LoginSuccessResponse'
+        "400":
+          description: Bad Request - could not parse the request or generate token
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "401":
+          description: Unauthorized - invalid credentials
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error - server error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Login a user
       tags:
-      - message
+      - Users
+  /users/signup:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user in the system
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User created successfully
+          schema:
+            $ref: '#/definitions/utils.SignUpSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Sign up a new user
+      tags:
+      - Users
 schemes:
 - http
 - https

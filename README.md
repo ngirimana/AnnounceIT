@@ -80,12 +80,18 @@ active,deactivated - default is pending
 
 Run the application
 
-```go run main.go
 ```
+
+go run main.go
+```
+
 Run Swagger
 
-```swag init
 ```
+
+swag init
+```
+
 Swagger URL
 
 ```http://localhost:8080/swagger/index.html

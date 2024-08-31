@@ -1,0 +1,12 @@
+POST http://localhost:8000/users/signup
+Content-Type: application/json
+
+{
+  "email": "testuser@gmail.com",
+		"password": "1234",
+		"first_name": "Test",
+		"last_name": "User",
+		"phone_number": "+250781475109",
+		"address": "KG 23 ST",
+		"is_admin": false
+}
