@@ -1,6 +1,8 @@
 package models
 
 import (
+	"errors"
+
 	"github.com/ngirimana/AnnounceIT/db"
 	"github.com/ngirimana/AnnounceIT/helpers"
 )
@@ -41,4 +43,22 @@ func (u *User) Save() error {
 
 	u.ID, err = newUser.LastInsertId()
 	return err
+}
+
+func (u *User) Authenticate() error {
+	query := "SELECT id, password FROM users WHERE email = ?"
+	row := db.DB.QueryRow(query, u.Email)
+
+	var retrievedPassword string
+	err := row.Scan(&u.ID, &retrievedPassword)
+	if err != nil {
+		return errors.New("credentials invalid")
+	}
+
+	isPasswordValid := helpers.CheckPassword(u.Password, retrievedPassword)
+	if !isPasswordValid {
+		return errors.New("invalid credentials")
+	}
+	return nil
+
 }

@@ -24,9 +24,9 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/message": {
-            "get": {
-                "description": "Returns a \"Hello World\" message",
+        "/users/login": {
+            "post": {
+                "description": "Authenticate a user and return a JWT token",
                 "consumes": [
                     "application/json"
                 ],
@@ -34,17 +34,43 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "message"
+                    "Users"
                 ],
-                "summary": "Show a message",
+                "summary": "Login a user",
+                "parameters": [
+                    {
+                        "description": "User login credentials",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/utils.LoginData"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "User logged in successfully with JWT token",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/utils.LoginSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - could not parse the request or generate token",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - invalid credentials",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error - server error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
                         }
                     }
                 }
@@ -136,20 +162,42 @@ const docTemplate = `{
                 }
             }
         },
+        "utils.LoginData": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "utils.LoginSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
         "utils.SignUpSuccessResponse": {
             "type": "object",
             "properties": {
-                "data": {
+                "message": {
+                    "description": "The success message",
+                    "type": "string"
+                },
+                "user": {
                     "description": "The user data",
                     "allOf": [
                         {
                             "$ref": "#/definitions/models.User"
                         }
                     ]
-                },
-                "message": {
-                    "description": "The success message",
-                    "type": "string"
                 }
             }
         }

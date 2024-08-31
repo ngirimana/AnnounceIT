@@ -25,15 +25,29 @@ definitions:
         description: The error message
         type: string
     type: object
+  utils.LoginData:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  utils.LoginSuccessResponse:
+    properties:
+      message:
+        type: string
+      token:
+        type: string
+    type: object
   utils.SignUpSuccessResponse:
     properties:
-      data:
-        allOf:
-        - $ref: '#/definitions/models.User'
-        description: The user data
       message:
         description: The success message
         type: string
+      user:
+        allOf:
+        - $ref: '#/definitions/models.User'
+        description: The user data
     type: object
 host: localhost:8000
 info:
@@ -50,23 +64,40 @@ info:
   title: AnnounceIT API
   version: "1.0"
 paths:
-  /message:
-    get:
+  /users/login:
+    post:
       consumes:
       - application/json
-      description: Returns a "Hello World" message
+      description: Authenticate a user and return a JWT token
+      parameters:
+      - description: User login credentials
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/utils.LoginData'
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: User logged in successfully with JWT token
           schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Show a message
+            $ref: '#/definitions/utils.LoginSuccessResponse'
+        "400":
+          description: Bad Request - could not parse the request or generate token
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "401":
+          description: Unauthorized - invalid credentials
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error - server error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Login a user
       tags:
-      - message
+      - Users
   /users/signup:
     post:
       consumes:
