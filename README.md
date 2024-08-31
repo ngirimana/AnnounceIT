@@ -41,7 +41,8 @@ active, deactivated.
 “phoneNumber” : String,
 “address” : String,
 “is_admin” : Boolean,
-}```
+}
+```
 
 
 - Announcement
@@ -57,7 +58,8 @@ active,deactivated - default is pending
 “start_date” : DateTime,
 “end_date” : DateTime,
 “created_on” : DateTime,
-}```
+}
+```
 
 - Flags
 
