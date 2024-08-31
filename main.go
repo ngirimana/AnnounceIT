@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 
+	"github.com/ngirimana/AnnounceIT/db"
 	_ "github.com/ngirimana/AnnounceIT/docs" // Replace with your module name to match the generated docs import
 	"github.com/ngirimana/AnnounceIT/routes"
 	swaggerFiles "github.com/swaggo/files"
@@ -26,6 +27,7 @@ import (
 
 // @schemes http https
 func main() {
+	db.InitDB()
 	server := gin.Default()
 
 	// Swagger endpoint to serve the API documentation
