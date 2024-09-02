@@ -24,6 +24,65 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/announcements": {
+            "post": {
+                "description": "Create an announcement and save it to the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Announcements"
+                ],
+                "summary": "Create an announcement",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Announcement object",
+                        "name": "announcement",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Announcement"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Announcement created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/utils.CreateAnnouncementSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Could not parse request body",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Authorization token is required or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/users/login": {
             "post": {
                 "description": "Authenticate a user and return a JWT token",
@@ -124,6 +183,56 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "models.Announcement": {
+            "type": "object",
+            "properties": {
+                "create_date": {
+                    "type": "string"
+                },
+                "end_date": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "owner_id": {
+                    "type": "integer"
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/models.Status"
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Status": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3,
+                4
+            ],
+            "x-enum-comments": {
+                "Accepted": "1",
+                "Active": "3",
+                "Deactivated": "4",
+                "Declined": "2",
+                "Pending": "0"
+            },
+            "x-enum-varnames": [
+                "Pending",
+                "Accepted",
+                "Declined",
+                "Active",
+                "Deactivated"
+            ]
+        },
         "models.User": {
             "type": "object",
             "properties": {
@@ -149,6 +258,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "phone_number": {
+                    "type": "string"
+                }
+            }
+        },
+        "utils.CreateAnnouncementSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "announcement": {
+                    "$ref": "#/definitions/models.Announcement"
+                },
+                "message": {
                     "type": "string"
                 }
             }

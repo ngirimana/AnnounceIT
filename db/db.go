@@ -41,6 +41,23 @@ func createTables() {
 		panic("Could not create users table: " + err.Error())
 	}
 
+	createAnnouncementsTable := `
+	CREATE TABLE IF NOT EXISTS announcements (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		owner_id INTEGER NOT NULL,
+		status  string NOT NULL DEFAULT 'pending',
+		text TEXT NOT NULL UNIQUE,
+		start_date DATETIME NOT NULL,
+		end_date DATETIME NOT NULL,
+		create_date DATETIME NOT NULL,
+		FOREIGN KEY(owner_id) REFERENCES users(id)
+	);`
+
+	_, err = DB.Exec(createAnnouncementsTable)
+	if err != nil {
+		panic("Could not create announcements table: " + err.Error())
+	}
+
 }
 
 // TruncateUsersTable removes all records from the users table
