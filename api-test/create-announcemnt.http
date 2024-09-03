@@ -1,0 +1,8 @@
+POST http://localhost:8000/announcements
+Content-Type: application/json
+
+{
+    "end_date": "2025-01-01T15:30:00.000Z",
+  "start_date": "2025-01-01T13:30:00.000Z",
+  "text": "This is a test announcement5"
+}
