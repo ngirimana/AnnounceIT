@@ -46,7 +46,7 @@ func createTables() {
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		owner_id INTEGER NOT NULL,
 		status  string NOT NULL DEFAULT 'pending',
-		text TEXT NOT NULL UNIQUE,
+		text TEXT NOT NULL ,
 		start_date DATETIME NOT NULL,
 		end_date DATETIME NOT NULL,
 		create_date DATETIME NOT NULL,
