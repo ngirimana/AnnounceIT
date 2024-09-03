@@ -1,5 +1,42 @@
 basePath: /
 definitions:
+  models.Announcement:
+    properties:
+      create_date:
+        type: string
+      end_date:
+        type: string
+      id:
+        type: integer
+      owner_id:
+        type: integer
+      start_date:
+        type: string
+      status:
+        $ref: '#/definitions/models.Status'
+      text:
+        type: string
+    type: object
+  models.Status:
+    enum:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    type: integer
+    x-enum-comments:
+      Accepted: "1"
+      Active: "3"
+      Deactivated: "4"
+      Declined: "2"
+      Pending: "0"
+    x-enum-varnames:
+    - Pending
+    - Accepted
+    - Declined
+    - Active
+    - Deactivated
   models.User:
     properties:
       address:
@@ -17,6 +54,13 @@ definitions:
       password:
         type: string
       phone_number:
+        type: string
+    type: object
+  utils.CreateAnnouncementSuccessResponse:
+    properties:
+      announcement:
+        $ref: '#/definitions/models.Announcement'
+      message:
         type: string
     type: object
   utils.ErrorResponse:
@@ -64,6 +108,45 @@ info:
   title: AnnounceIT API
   version: "1.0"
 paths:
+  /announcements:
+    post:
+      consumes:
+      - application/json
+      description: Create an announcement and save it to the database
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Announcement object
+        in: body
+        name: announcement
+        required: true
+        schema:
+          $ref: '#/definitions/models.Announcement'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Announcement created successfully
+          schema:
+            $ref: '#/definitions/utils.CreateAnnouncementSuccessResponse'
+        "400":
+          description: Could not parse request body
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "401":
+          description: Authorization token is required or invalid
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Create an announcement
+      tags:
+      - Announcements
   /users/login:
     post:
       consumes:

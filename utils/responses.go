@@ -20,3 +20,8 @@ type LoginData struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
+
+type CreateAnnouncementSuccessResponse struct {
+	Message string              `json:"message"`
+	Data    models.Announcement `json:"announcement"`
+}
