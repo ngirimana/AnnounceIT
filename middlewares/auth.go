@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -10,7 +9,6 @@ import (
 
 func Authenticate(context *gin.Context) {
 	token := context.Request.Header.Get("Authorization")
-	fmt.Println(token)
 	if token == "" {
 		context.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Authorization token is required"})
 		return
