@@ -2,7 +2,7 @@ package utils
 
 import "github.com/ngirimana/AnnounceIT/models"
 
-type SignUpSuccessResponse struct {
+type UserSuccessResponse struct {
 	Message string      `json:"message"` // The success message
 	Data    models.User `json:"user"`    // The user data
 }

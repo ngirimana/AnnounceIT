@@ -83,7 +83,7 @@ definitions:
       token:
         type: string
     type: object
-  utils.SignUpSuccessResponse:
+  utils.UserSuccessResponse:
     properties:
       message:
         description: The success message
@@ -147,6 +147,36 @@ paths:
       summary: Create an announcement
       tags:
       - Announcements
+  /users/{email}:
+    get:
+      consumes:
+      - application/json
+      description: Get a user by their email address
+      parameters:
+      - description: Email
+        in: path
+        name: email
+        required: true
+        type: string
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User retrieved successfully
+          schema:
+            $ref: '#/definitions/utils.UserSuccessResponse'
+        "404":
+          description: user not found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Retrieve user by email
+      tags:
+      - Users
   /users/login:
     post:
       consumes:
@@ -199,9 +229,13 @@ paths:
         "201":
           description: User created successfully
           schema:
-            $ref: '#/definitions/utils.SignUpSuccessResponse'
+            $ref: '#/definitions/utils.UserSuccessResponse'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "409":
+          description: Conflict - user already exists
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
         "500":

@@ -67,3 +67,10 @@ func TruncateUsersTable() {
 		log.Fatalf("Could not truncate users table: %v", err)
 	}
 }
+
+func TruncateAnnouncementsTable() {
+	_, err := DB.Exec("DELETE FROM announcements")
+	if err != nil {
+		log.Fatalf("Could not truncate announcements table: %v", err)
+	}
+}

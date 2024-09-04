@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"net/http"
 	"net/http/httptest"
@@ -88,6 +89,50 @@ func TestSignUpSuccess(t *testing.T) {
 	id, ok := user["id"].(float64) // JSON numbers are parsed as float64
 	assert.True(t, ok)
 	assert.Greater(t, id, float64(0))
+}
+
+func TestSignUpExistingUser(t *testing.T) {
+	// Initialize the database connection for the test
+	db.InitDB()
+
+	// Clean up the users table before running the test
+
+	// Create a new router using Gin
+	router := gin.Default()
+	router.POST("/users/signup", SignUp)
+
+	// Create a request body with the correct phone number
+	body := `{
+		"email": "test@gmail.com",
+		"password": "1234",
+		"first_name": "Test",
+		"last_name": "User",
+		"phone_number": "+250781475108",
+		"address": "KG 23 ST",
+		"is_admin": false
+	}`
+
+	// Create a request to pass to our handler
+	req, _ := http.NewRequest("POST", "/users/signup", strings.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+
+	// Create a ResponseRecorder to record the response
+	resp := httptest.NewRecorder()
+
+	// Perform the request
+	router.ServeHTTP(resp, req)
+
+	// Check the status code is what we expect
+	assert.Equal(t, http.StatusConflict, resp.Code)
+
+	// Parse the actual response body
+	var actualResponse map[string]interface{}
+	err := json.Unmarshal(resp.Body.Bytes(), &actualResponse)
+	fmt.Println(actualResponse)
+	assert.NoError(t, err)
+
+	// Check the response message
+	assert.Equal(t, "Conflict - user already exists", actualResponse["error"])
 }
 
 func TestSignUpUnformattedReq(t *testing.T) {
@@ -348,6 +393,7 @@ func TestCreateAnnouncementInvalidToken(t *testing.T) {
 }
 
 func TestCreateAnnouncementSuccess(t *testing.T) {
+
 	gin.SetMode(gin.TestMode)
 
 	router := gin.Default()
@@ -361,7 +407,7 @@ func TestCreateAnnouncementSuccess(t *testing.T) {
 	}`
 
 	req, _ := http.NewRequest(http.MethodPost, "/announcements", strings.NewReader(body))
-	req.Header.Set("Authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGdtYWlsLmNvbSIsImV4cCI6MTcyNTQzMzEwOCwidXNlcklkIjoxfQ.Km4A-YonNhXkOPMwyh0tWC3vUSNVoNsQ5kCK8jpu-SE")
+	req.Header.Set("Authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGdtYWlsLmNvbSIsImV4cCI6MTcyNTUxODk1OCwidXNlcklkIjoxfQ.yYNVL1Id1WKDybxmDkuaZZJdDm_6msaUtnD_1GRn_rY")
 	req.Header.Set("Content-Type", "application/json")
 
 	rr := httptest.NewRecorder()
@@ -369,4 +415,82 @@ func TestCreateAnnouncementSuccess(t *testing.T) {
 
 	assert.Equal(t, http.StatusCreated, rr.Code)
 	assert.Contains(t, rr.Body.String(), "Announcement created successfully")
+}
+func TestGetUser(t *testing.T) {
+	// Initialize the Gin router
+	router := gin.Default()
+
+	// Define the route for GetUser
+	router.GET("/users/:email", middlewares.Authenticate, GetUser)
+
+	// Create test cases
+	tests := []struct {
+		name           string
+		email          string
+		authHeader     string
+		expectedStatus int
+		expectedBody   string
+	}{
+		{
+			name:           "User found",
+			email:          "test@gmail.com",
+			authHeader:     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGdtYWlsLmNvbSIsImV4cCI6MTcyNTUxODk1OCwidXNlcklkIjoxfQ.yYNVL1Id1WKDybxmDkuaZZJdDm_6msaUtnD_1GRn_rY",
+			expectedStatus: http.StatusOK,
+			expectedBody:   "User retrieved successfully",
+		},
+		{
+			name:           "User not found",
+			email:          "test1@gmail.com",
+			authHeader:     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGdtYWlsLmNvbSIsImV4cCI6MTcyNTUxODk1OCwidXNlcklkIjoxfQ.yYNVL1Id1WKDybxmDkuaZZJdDm_6msaUtnD_1GRn_rY",
+			expectedStatus: http.StatusNotFound,
+			expectedBody:   "user not found",
+		},
+		{
+			name:           "Unauthorized request",
+			email:          "test@gmail.com",
+			authHeader:     "",
+			expectedStatus: http.StatusUnauthorized,
+			expectedBody:   "Authorization token is required",
+		},
+		{
+			name:           "Unauthorized request",
+			email:          "test@gmail.com",
+			authHeader:     "dfvjdsjvdsjvbdsjbvds",
+			expectedStatus: http.StatusUnauthorized,
+			expectedBody:   "Invalid token",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Create a new request to pass to our handler
+			req, _ := http.NewRequest("GET", "/users/"+tt.email, nil)
+			req.Header.Set("Content-Type", "application/json")
+			if tt.authHeader != "" {
+				req.Header.Set("Authorization", tt.authHeader)
+			}
+
+			// Create a ResponseRecorder to record the response
+			resp := httptest.NewRecorder()
+
+			// Perform the request
+			router.ServeHTTP(resp, req)
+
+			// Check the status code is what we expect
+			assert.Equal(t, tt.expectedStatus, resp.Code)
+
+			// Parse the actual response body
+			var actualResponse map[string]interface{}
+
+			err := json.Unmarshal(resp.Body.Bytes(), &actualResponse)
+			assert.NoError(t, err)
+
+			// Check the response message
+			if tt.expectedStatus == http.StatusOK {
+				assert.Equal(t, tt.expectedBody, actualResponse["message"])
+			} else {
+				assert.Equal(t, tt.expectedBody, actualResponse["error"])
+			}
+		})
+	}
 }
