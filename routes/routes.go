@@ -12,6 +12,7 @@ func RegisterRoutes(server *gin.Engine) {
 	server.POST("/users/login", controllers.Login)
 	authenticated := server.Group("/")
 	authenticated.Use(middlewares.Authenticate)
+	authenticated.GET("/users/:email", controllers.GetUser)
 	authenticated.POST("/announcements", controllers.CreateAnnouncement)
 
 }

@@ -62,3 +62,14 @@ func (u *User) Authenticate() error {
 	return nil
 
 }
+
+func GetUser(email string) (*User, error) {
+	query := "SELECT id, first_name, last_name, email, phone_number, address, is_admin FROM users WHERE email = ?"
+	var user User
+	err := db.DB.QueryRow(query, email).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.PhoneNumber, &user.Address, &user.IsAdmin)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+
+}
