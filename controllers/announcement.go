@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -25,8 +24,7 @@ func CreateAnnouncement(context *gin.Context) {
 	var announcement models.Announcement
 	err := context.ShouldBindJSON(&announcement)
 	if err != nil {
-		fmt.Println(err)
-		context.JSON(http.StatusBadRequest, gin.H{"error": "Could not parse request body"})
+		context.JSON(http.StatusBadRequest, gin.H{"error": "could not parse request body"})
 		return
 	}
 

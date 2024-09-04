@@ -39,8 +39,7 @@ func VerifyToken(tokenString string) (int64, error) {
 	if !ok {
 		return 0, errors.New("could not parse claims")
 	}
-	// email:=claims["email"].(string)
-	fmt.Println(claims["userId"])
+
 	userId := int64(claims["userId"].(float64))
 	return userId, nil
 }
