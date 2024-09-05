@@ -25,6 +25,33 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/announcements": {
+            "get": {
+                "description": "Retrieve all announcements",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Announcements"
+                ],
+                "summary": "Get all announcements",
+                "responses": {
+                    "200": {
+                        "description": "Announcements retrieved successfully",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Announcement"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Could not fetch announcements",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Create an announcement and save it to the database",
                 "consumes": [
@@ -59,7 +86,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Announcement created successfully",
                         "schema": {
-                            "$ref": "#/definitions/utils.CreateAnnouncementSuccessResponse"
+                            "$ref": "#/definitions/utils.AnnouncementSuccessResponse"
                         }
                     },
                     "400": {
@@ -76,6 +103,47 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/announcements/{id}": {
+            "get": {
+                "description": "Retrieve an announcement by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Announcements"
+                ],
+                "summary": "Get a single announcement",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Announcement ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Announcement retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/utils.AnnouncementSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid announcement ID",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Announcement not found",
                         "schema": {
                             "$ref": "#/definitions/utils.ErrorResponse"
                         }
@@ -313,7 +381,7 @@ const docTemplate = `{
                 }
             }
         },
-        "utils.CreateAnnouncementSuccessResponse": {
+        "utils.AnnouncementSuccessResponse": {
             "type": "object",
             "properties": {
                 "announcement": {

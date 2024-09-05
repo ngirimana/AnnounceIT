@@ -21,7 +21,7 @@ type LoginData struct {
 	Password string `json:"password"`
 }
 
-type CreateAnnouncementSuccessResponse struct {
+type AnnouncementSuccessResponse struct {
 	Message string              `json:"message"`
 	Data    models.Announcement `json:"announcement"`
 }

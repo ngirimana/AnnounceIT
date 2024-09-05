@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"io"
+	"time"
 
 	"net/http"
 	"net/http/httptest"
@@ -277,7 +278,7 @@ func TestCreateAnnouncement(t *testing.T) {
 				"start_date": "2025-01-01T13:30:00.000Z"
 				"text": "This is a test announcement"
 			}`,
-			authHeader:     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGdtYWlsLmNvbSIsImV4cCI6MTcyNTUxODk1OCwidXNlcklkIjoxfQ.yYNVL1Id1WKDybxmDkuaZZJdDm_6msaUtnD_1GRn_rY",
+			authHeader:     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGdtYWlsLmNvbSIsImV4cCI6MTcyNTYwMzc4MSwidXNlcklkIjoxfQ.PqhxSQ8Cw3kakvirIBiINCQ7kHh2dbNeTkJN7uwzwsM",
 			expectedStatus: http.StatusBadRequest,
 			expectedBody:   "could not parse request body",
 		},
@@ -289,19 +290,19 @@ func TestCreateAnnouncement(t *testing.T) {
 				"start_date": "2025-01-01T13:30:00.000Z",
 				"text": "This is a test announcement"
 			}`,
-			authHeader:     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGdtYWlsLmNvbSIsImV4cCI6MTcyNTUxODk1OCwidXNlcklkIjoxfQ.yYNVL1Id1WKDybxmDkuaZZJdDm_6msaUtnD_1GRn_rY",
+			authHeader:     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGdtYWlsLmNvbSIsImV4cCI6MTcyNTYwMzc4MSwidXNlcklkIjoxfQ.PqhxSQ8Cw3kakvirIBiINCQ7kHh2dbNeTkJN7uwzwsM",
 			expectedStatus: http.StatusCreated,
 			expectedBody:   "Announcement created successfully",
 		},
 		{
-			name: "Invalid request - Empty request body",
+			name: "Invalid request -unformatted request",
 			body: `
 			{
 				"end_date": "2025-01-01T15:30:00.000Z",
 				"start_date": "2025-01-01T13:30:00.000Z"
 				"text": "This is a test announcement"
 			}`,
-			authHeader:     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGdtYWlsLmNvbSIsImV4cCI6MTcyNTUxODk1OCwidXNlcklkIjoxfQ.yYNVL1Id1WKDybxmDkuaZZJdDm_6msaUtnD_1GRn_rY",
+			authHeader:     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGdtYWlsLmNvbSIsImV4cCI6MTcyNTYwMzc4MSwidXNlcklkIjoxfQ.PqhxSQ8Cw3kakvirIBiINCQ7kHh2dbNeTkJN7uwzwsM",
 			expectedStatus: http.StatusBadRequest,
 			expectedBody:   "could not parse request body",
 		},
@@ -350,14 +351,14 @@ func TestGetUser(t *testing.T) {
 		{
 			name:           "User found",
 			email:          "test@gmail.com",
-			authHeader:     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGdtYWlsLmNvbSIsImV4cCI6MTcyNTUxODk1OCwidXNlcklkIjoxfQ.yYNVL1Id1WKDybxmDkuaZZJdDm_6msaUtnD_1GRn_rY",
+			authHeader:     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGdtYWlsLmNvbSIsImV4cCI6MTcyNTYwMzc4MSwidXNlcklkIjoxfQ.PqhxSQ8Cw3kakvirIBiINCQ7kHh2dbNeTkJN7uwzwsM",
 			expectedStatus: http.StatusOK,
 			expectedBody:   "User retrieved successfully",
 		},
 		{
 			name:           "User not found",
 			email:          "test1@gmail.com",
-			authHeader:     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGdtYWlsLmNvbSIsImV4cCI6MTcyNTUxODk1OCwidXNlcklkIjoxfQ.yYNVL1Id1WKDybxmDkuaZZJdDm_6msaUtnD_1GRn_rY",
+			authHeader:     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGdtYWlsLmNvbSIsImV4cCI6MTcyNTYwMzc4MSwidXNlcklkIjoxfQ.PqhxSQ8Cw3kakvirIBiINCQ7kHh2dbNeTkJN7uwzwsM",
 			expectedStatus: http.StatusNotFound,
 			expectedBody:   "user not found",
 		},
@@ -409,6 +410,114 @@ func TestGetUser(t *testing.T) {
 			}
 		})
 	}
-	db.TruncateUsersTable()
-	db.TruncateAnnouncementsTable()
+
+}
+
+func TestGetAnnouncements(t *testing.T) {
+	// Set Gin to Test mode to suppress logging output
+	gin.SetMode(gin.TestMode)
+	gin.DefaultWriter = io.Discard
+
+	// Initialize the Gin engine
+	router := gin.Default()
+	router.GET("/announcements", GetAnnouncements)
+
+	// Define test cases
+	tests := []struct {
+		name           string
+		setup          func()
+		expectedStatus int
+		expectedBody   map[string]interface{}
+		checkLength    bool
+		expectedLength int
+	}{
+		{
+			name: "No Announcements",
+			setup: func() {
+				// Clear the announcements table or ensure it is empty
+				db.TruncateAnnouncementsTable()
+			},
+			expectedStatus: http.StatusNotFound,
+			expectedBody:   map[string]interface{}{"error": "No announcements found"},
+		},
+		{
+			name: "Three Announcements",
+			setup: func() {
+				// Prepare the test data: Add exactly 3 announcements to the data source
+				announcements := []models.Announcement{
+					{
+						ID:         1,
+						OwnerID:    1,
+						Status:     models.Pending, // Replace with the actual enum or type for Status
+						Text:       "First announcement",
+						StartDate:  time.Now().AddDate(0, 0, -1), // Yesterday
+						EndDate:    time.Now().AddDate(0, 1, 0),  // Next month
+						CreateDate: time.Now(),
+					},
+					{
+						ID:         2,
+						OwnerID:    1,
+						Status:     models.Pending,
+						Text:       "Second announcement",
+						StartDate:  time.Now().AddDate(0, 0, -2), // Two days ago
+						EndDate:    time.Now().AddDate(0, 1, 0),  // Next month
+						CreateDate: time.Now(),
+					},
+					{
+						ID:         3,
+						OwnerID:    1,
+						Status:     models.Pending,
+						Text:       "Third announcement",
+						StartDate:  time.Now().AddDate(0, 0, -3), // Three days ago
+						EndDate:    time.Now().AddDate(0, 1, 0),  // Next month
+						CreateDate: time.Now(),
+					},
+				}
+
+				// Insert the test data into your database or in-memory storage
+				for _, announcement := range announcements {
+					err := announcement.Create() // Implement this or use your project's data insertion method
+					assert.NoError(t, err, "Failed to insert test announcement")
+				}
+			},
+			expectedStatus: http.StatusOK,
+			expectedBody:   map[string]interface{}{"message": "Announcements retrieved successfully"},
+			checkLength:    true,
+			expectedLength: 3,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Run the setup function for the test case
+			tt.setup()
+
+			// Create a new HTTP request to the /announcements route
+			req, _ := http.NewRequest(http.MethodGet, "/announcements", nil)
+
+			// Create a response recorder to capture the response
+			w := httptest.NewRecorder()
+
+			// Serve the HTTP request to the router
+			router.ServeHTTP(w, req)
+
+			// Check the response code
+			assert.Equal(t, tt.expectedStatus, w.Code)
+
+			// Parse the response body
+			var responseBody map[string]interface{}
+			err := json.Unmarshal(w.Body.Bytes(), &responseBody)
+			assert.NoError(t, err)
+
+			// Check the response content for the expected message
+			assert.Equal(t, tt.expectedBody["message"], responseBody["message"])
+
+			// If length check is required, validate the length of the announcements
+			if tt.checkLength {
+				announcementsData, ok := responseBody["announcements"].([]interface{})
+				assert.True(t, ok, "Response should contain an 'announcements' key with a slice value")
+				assert.Equal(t, tt.expectedLength, len(announcementsData), "There should be exactly 3 announcements")
+			}
+		})
+	}
 }
