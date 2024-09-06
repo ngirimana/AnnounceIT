@@ -48,3 +48,37 @@ func (a *Announcement) Create() error {
 	a.ID, err = result.LastInsertId()
 	return err
 }
+
+func GetAnnouncements() ([]Announcement, error) {
+	query := `SELECT * FROM announcements`
+	rows, err := db.DB.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	announcements := []Announcement{}
+	for rows.Next() {
+		var a Announcement
+		err := rows.Scan(&a.ID, &a.OwnerID, &a.Status, &a.Text, &a.StartDate, &a.EndDate, &a.CreateDate)
+		if err != nil {
+			return nil, err
+		}
+		announcements = append(announcements, a)
+	}
+
+	return announcements, nil
+}
+
+func GetAnnouncementByID(id int64) (*Announcement, error) {
+	query := `SELECT * FROM announcements WHERE id = ?`
+	row := db.DB.QueryRow(query, id)
+
+	var a Announcement
+	err := row.Scan(&a.ID, &a.OwnerID, &a.Status, &a.Text, &a.StartDate, &a.EndDate, &a.CreateDate)
+	if err != nil {
+		return nil, err
+	}
+
+	return &a, nil
+}

@@ -56,7 +56,7 @@ definitions:
       phone_number:
         type: string
     type: object
-  utils.CreateAnnouncementSuccessResponse:
+  utils.AnnouncementSuccessResponse:
     properties:
       announcement:
         $ref: '#/definitions/models.Announcement'
@@ -109,6 +109,24 @@ info:
   version: "1.0"
 paths:
   /announcements:
+    get:
+      description: Retrieve all announcements
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Announcements retrieved successfully
+          schema:
+            items:
+              $ref: '#/definitions/models.Announcement'
+            type: array
+        "500":
+          description: Could not fetch announcements
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Get all announcements
+      tags:
+      - Announcements
     post:
       consumes:
       - application/json
@@ -131,7 +149,7 @@ paths:
         "201":
           description: Announcement created successfully
           schema:
-            $ref: '#/definitions/utils.CreateAnnouncementSuccessResponse'
+            $ref: '#/definitions/utils.AnnouncementSuccessResponse'
         "400":
           description: Could not parse request body
           schema:
@@ -145,6 +163,33 @@ paths:
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
       summary: Create an announcement
+      tags:
+      - Announcements
+  /announcements/{id}:
+    get:
+      description: Retrieve an announcement by its ID
+      parameters:
+      - description: Announcement ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Announcement retrieved successfully
+          schema:
+            $ref: '#/definitions/utils.AnnouncementSuccessResponse'
+        "400":
+          description: Invalid announcement ID
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Announcement not found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Get a single announcement
       tags:
       - Announcements
   /users/{email}:
