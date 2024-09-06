@@ -2,7 +2,10 @@ package controllers
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
+	"strconv"
 	"time"
 
 	"net/http"
@@ -278,7 +281,7 @@ func TestCreateAnnouncement(t *testing.T) {
 				"start_date": "2025-01-01T13:30:00.000Z"
 				"text": "This is a test announcement"
 			}`,
-			authHeader:     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGdtYWlsLmNvbSIsImV4cCI6MTcyNTYwMzc4MSwidXNlcklkIjoxfQ.PqhxSQ8Cw3kakvirIBiINCQ7kHh2dbNeTkJN7uwzwsM",
+			authHeader:     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGdtYWlsLmNvbSIsImV4cCI6MTc1NzE3MTY1NCwidXNlcklkIjoxfQ.z8K8cmNVyaa3_L5CkvyYn8204FfhvTQbXNKMWCLSJfA",
 			expectedStatus: http.StatusBadRequest,
 			expectedBody:   "could not parse request body",
 		},
@@ -290,7 +293,7 @@ func TestCreateAnnouncement(t *testing.T) {
 				"start_date": "2025-01-01T13:30:00.000Z",
 				"text": "This is a test announcement"
 			}`,
-			authHeader:     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGdtYWlsLmNvbSIsImV4cCI6MTcyNTYwMzc4MSwidXNlcklkIjoxfQ.PqhxSQ8Cw3kakvirIBiINCQ7kHh2dbNeTkJN7uwzwsM",
+			authHeader:     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGdtYWlsLmNvbSIsImV4cCI6MTc1NzE3MTY1NCwidXNlcklkIjoxfQ.z8K8cmNVyaa3_L5CkvyYn8204FfhvTQbXNKMWCLSJfA",
 			expectedStatus: http.StatusCreated,
 			expectedBody:   "Announcement created successfully",
 		},
@@ -302,7 +305,7 @@ func TestCreateAnnouncement(t *testing.T) {
 				"start_date": "2025-01-01T13:30:00.000Z"
 				"text": "This is a test announcement"
 			}`,
-			authHeader:     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGdtYWlsLmNvbSIsImV4cCI6MTcyNTYwMzc4MSwidXNlcklkIjoxfQ.PqhxSQ8Cw3kakvirIBiINCQ7kHh2dbNeTkJN7uwzwsM",
+			authHeader:     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGdtYWlsLmNvbSIsImV4cCI6MTc1NzE3MTY1NCwidXNlcklkIjoxfQ.z8K8cmNVyaa3_L5CkvyYn8204FfhvTQbXNKMWCLSJfA",
 			expectedStatus: http.StatusBadRequest,
 			expectedBody:   "could not parse request body",
 		},
@@ -351,14 +354,14 @@ func TestGetUser(t *testing.T) {
 		{
 			name:           "User found",
 			email:          "test@gmail.com",
-			authHeader:     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGdtYWlsLmNvbSIsImV4cCI6MTcyNTYwMzc4MSwidXNlcklkIjoxfQ.PqhxSQ8Cw3kakvirIBiINCQ7kHh2dbNeTkJN7uwzwsM",
+			authHeader:     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGdtYWlsLmNvbSIsImV4cCI6MTc1NzE3MTY1NCwidXNlcklkIjoxfQ.z8K8cmNVyaa3_L5CkvyYn8204FfhvTQbXNKMWCLSJfA",
 			expectedStatus: http.StatusOK,
 			expectedBody:   "User retrieved successfully",
 		},
 		{
 			name:           "User not found",
 			email:          "test1@gmail.com",
-			authHeader:     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGdtYWlsLmNvbSIsImV4cCI6MTcyNTYwMzc4MSwidXNlcklkIjoxfQ.PqhxSQ8Cw3kakvirIBiINCQ7kHh2dbNeTkJN7uwzwsM",
+			authHeader:     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGdtYWlsLmNvbSIsImV4cCI6MTc1NzE3MTY1NCwidXNlcklkIjoxfQ.z8K8cmNVyaa3_L5CkvyYn8204FfhvTQbXNKMWCLSJfA",
 			expectedStatus: http.StatusNotFound,
 			expectedBody:   "user not found",
 		},
@@ -520,4 +523,92 @@ func TestGetAnnouncements(t *testing.T) {
 			}
 		})
 	}
+}
+func GetFirstAnnouncementID(announcements []models.Announcement) (int64, error) {
+	if len(announcements) == 0 {
+		return 0, errors.New("no announcements available")
+	}
+	return announcements[0].ID, nil
+}
+func TestGetAnnouncement(t *testing.T) {
+	// db.TruncateAnnouncementsTable()
+	// Set Gin to Test mode to suppress logging output
+	announcement, err := models.GetAnnouncements()
+	if err != nil {
+		fmt.Println(err)
+	}
+	id, err := GetFirstAnnouncementID(announcement)
+	if err != nil {
+		fmt.Println(err)
+
+	}
+	idStr := strconv.FormatInt(id, 10)
+
+	gin.SetMode(gin.TestMode)
+	gin.DefaultWriter = io.Discard
+
+	// Initialize the Gin engine
+	router := gin.Default()
+	router.GET("/announcements/:id", GetAnnouncement)
+
+	// Define test cases
+	tests := []struct {
+		name           string
+		announcementID string
+		expectedStatus int
+		expectedBody   map[string]interface{}
+	}{
+		{
+			name:           "Invalid ID Format",
+			announcementID: "abc", // Non-numeric ID
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   map[string]interface{}{"error": "Invalid announcement ID"},
+		},
+		{
+			name:           "Announcement Not Found",
+			announcementID: "9999", // Assuming this ID does not exist
+			expectedStatus: http.StatusNotFound,
+			expectedBody:   map[string]interface{}{"error": "Announcement not found"},
+		},
+		{
+			name:           "Announcement Retrieved Successfully",
+			announcementID: idStr, // ID to retrieve
+			expectedStatus: http.StatusOK,
+			expectedBody:   map[string]interface{}{"message": "Announcement retrieved successfully"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Create a new HTTP request to the /announcements/:id route
+			req, _ := http.NewRequest(http.MethodGet, "/announcements/"+tt.announcementID, nil)
+
+			// Create a response recorder to capture the response
+			w := httptest.NewRecorder()
+
+			// Serve the HTTP request to the router
+			router.ServeHTTP(w, req)
+
+			// Check the response code
+			assert.Equal(t, tt.expectedStatus, w.Code)
+
+			// Parse the response body
+			var responseBody map[string]interface{}
+			err := json.Unmarshal(w.Body.Bytes(), &responseBody)
+			assert.NoError(t, err)
+
+			// Check the response content for the expected message or error
+			if tt.expectedStatus == http.StatusOK {
+				assert.Equal(t, tt.expectedBody["message"], responseBody["message"])
+				announcementData, ok := responseBody["announcement"].(map[string]interface{})
+				assert.True(t, ok, "Response should contain an 'announcement' key with a map value")
+				assert.Equal(t, id, int64(announcementData["id"].(float64)), "The announcement ID should match the requested ID")
+			} else {
+				assert.Equal(t, tt.expectedBody["error"], responseBody["error"])
+			}
+
+
+		})
+	}
+
 }
