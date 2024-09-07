@@ -1,5 +1,6 @@
 POST http://localhost:8000/announcements
 Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3R1c2VyQGdtYWlsLmNvbSIsImV4cCI6MTc1NzI4OTI2MywidXNlcklkIjoxfQ.ZZURqXsCh-eI0Qs8Vw4UXCgNdu_-TZPtFA0y7oEyE-A
 
 {
     "end_date": "2025-01-01T15:30:00.000Z",

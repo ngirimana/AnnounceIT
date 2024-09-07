@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/ngirimana/AnnounceIT/db"
@@ -81,4 +82,28 @@ func GetAnnouncementByID(id int64) (*Announcement, error) {
 	}
 
 	return &a, nil
+}
+
+func (a *Announcement) Update() error {
+	query := `UPDATE announcements SET status = ?, text = ?, start_date = ?, end_date = ? WHERE id = ?`
+	stmt, err := db.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	fmt.Println(a.Text)
+
+	_, err = stmt.Exec(a.Status, a.Text, a.StartDate, a.EndDate, a.ID)
+	return err
+}
+
+func (a *Announcement) Delete() error {
+	query := `DELETE FROM announcements WHERE id = ?`
+	stmt, err := db.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(a.ID)
+	return err
 }

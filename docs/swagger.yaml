@@ -63,6 +63,11 @@ definitions:
       message:
         type: string
     type: object
+  utils.DeleteSuccessResponse:
+    properties:
+      message:
+        type: string
+    type: object
   utils.ErrorResponse:
     properties:
       error:
@@ -166,6 +171,44 @@ paths:
       tags:
       - Announcements
   /announcements/{id}:
+    delete:
+      description: Deletes an existing announcement by its ID. The user must be the
+        owner of the announcement to delete it.
+      parameters:
+      - description: Announcement ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Announcement deleted successfully
+          schema:
+            $ref: '#/definitions/utils.DeleteSuccessResponse'
+        "400":
+          description: Invalid announcement ID
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "403":
+          description: You are not allowed to delete this announcement
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Announcement not found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Could not delete announcement
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Delete an announcement
+      tags:
+      - Announcements
     get:
       description: Retrieve an announcement by its ID
       parameters:
@@ -190,6 +233,50 @@ paths:
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
       summary: Get a single announcement
+      tags:
+      - Announcements
+    patch:
+      description: Updates an existing announcement by its ID. The user must be the
+        owner of the announcement to update it.
+      parameters:
+      - description: Announcement ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Update Announcement
+        in: body
+        name: announcement
+        required: true
+        schema:
+          $ref: '#/definitions/models.Announcement'
+      responses:
+        "200":
+          description: Announcement updated successfully
+          schema:
+            $ref: '#/definitions/utils.AnnouncementSuccessResponse'
+        "400":
+          description: Could not parse request body
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "403":
+          description: You are not allowed to update this announcement
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Announcement not found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Could not update announcement
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Update an announcement
       tags:
       - Announcements
   /users/{email}:
