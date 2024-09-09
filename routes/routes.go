@@ -13,9 +13,11 @@ func RegisterRoutes(server *gin.Engine) {
 	authenticated := server.Group("/")
 	authenticated.Use(middlewares.Authenticate)
 	authenticated.GET("/users/:email", controllers.GetUser)
+	authenticated.PATCH("/users/:id/flag", controllers.FlagUser)
 	authenticated.POST("/announcements", controllers.CreateAnnouncement)
 	authenticated.PATCH("/announcements/:id", controllers.UpdateAnnouncement)
 	authenticated.DELETE("/announcements/:id", controllers.DeleteAnnouncement)
+	authenticated.PATCH("/announcements/:id/status", controllers.ChangeAnnouncementStatus)
 
 	server.GET("/announcements", controllers.GetAnnouncements)
 	server.GET("/announcements/:id", controllers.GetAnnouncement)

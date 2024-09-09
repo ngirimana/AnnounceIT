@@ -14,12 +14,13 @@ func Authenticate(context *gin.Context) {
 		return
 	}
 
-	userId, err := helpers.VerifyToken(token)
+	userId, isAdmin, err := helpers.VerifyToken(token)
 
 	if err != nil {
 		context.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 		return
 	}
 	context.Set("userId", userId)
+	context.Set("isAdmin", isAdmin)
 	context.Next()
 }

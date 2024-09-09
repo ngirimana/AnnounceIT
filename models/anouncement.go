@@ -107,3 +107,14 @@ func (a *Announcement) Delete() error {
 	_, err = stmt.Exec(a.ID)
 	return err
 }
+
+func ChangeAnnouncementStatus(id int64, status Status) error {
+	query := `UPDATE announcements SET status = ? WHERE id = ?`
+	stmt, err := db.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(status, id)
+	return err
+}

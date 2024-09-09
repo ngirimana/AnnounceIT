@@ -279,6 +279,44 @@ paths:
       summary: Update an announcement
       tags:
       - Announcements
+  /announcements/{id}/status:
+    patch:
+      description: Change the status of an announcement by its ID
+      parameters:
+      - description: Announcement ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Announcement status updated successfully
+          schema:
+            $ref: '#/definitions/utils.AnnouncementSuccessResponse'
+        "400":
+          description: Invalid announcement ID or status value
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "401":
+          description: You are not allowed to update this announcement
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Announcement not found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Could not update announcement status
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Change announcement status
+      tags:
+      - Announcements
   /users/{email}:
     get:
       consumes:

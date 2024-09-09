@@ -16,6 +16,7 @@ type User struct {
 	PhoneNumber string `json:"phone_number"`
 	Address     string `json:"address"`
 	IsAdmin     bool   `json:"is_admin"`
+	Flagged     bool   `json:"flagged"`
 }
 
 func (u *User) Save() error {
@@ -72,4 +73,15 @@ func GetUser(email string) (*User, error) {
 	}
 	return &user, nil
 
+}
+
+func (u *User) FlagUser() error {
+	query := "UPDATE users SET flagged = true WHERE id = ?"
+	stmt, err := db.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(u.ID)
+	return err
 }

@@ -71,7 +71,7 @@ func Login(context *gin.Context) {
 		context.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
 	}
-	jwt, err := helpers.GenerateToken(user.Email, user.ID)
+	jwt, err := helpers.GenerateToken(user.Email, user.ID, user.IsAdmin)
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": "could not generate token"})
 		return
@@ -100,4 +100,26 @@ func GetUser(context *gin.Context) {
 	}
 	user.Password = ""
 	context.JSON(http.StatusOK, gin.H{"message": "User retrieved successfully", "user": user})
+}
+
+func FlagUser(context *gin.Context) {
+	email := context.Param("id")
+	user, err := models.GetUser(email)
+	if err != nil {
+		context.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		return
+	}
+	isAdmin := context.GetBool("isAdmin")
+	if isAdmin {
+		context.JSON(http.StatusForbidden, gin.H{"error": "You are not allowed to delete this announcement"})
+		return
+	}
+
+	err = user.FlagUser()
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	user.Password = ""
+	context.JSON(http.StatusOK, gin.H{"message": "User flagged successfully", "user": user})
 }

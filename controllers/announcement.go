@@ -160,8 +160,8 @@ func DeleteAnnouncement(context *gin.Context) {
 		return
 	}
 
-	userId := context.GetInt64("userId")
-	if announcement.OwnerID != userId {
+	isAdmin := context.GetBool("isAdmin")
+	if isAdmin {
 		context.JSON(http.StatusForbidden, gin.H{"error": "You are not allowed to delete this announcement"})
 		return
 	}
@@ -172,4 +172,56 @@ func DeleteAnnouncement(context *gin.Context) {
 	}
 	context.JSON(http.StatusOK, gin.H{"message": "Announcement deleted successfully"})
 
+}
+
+func parseStatus(status string) (models.Status, error) {
+	val, err := strconv.Atoi(status)
+	if err != nil || val < 0 || val > 4 {
+		return -1, fmt.Errorf("invalid status value")
+	}
+	return models.Status(val), nil
+}
+
+// ChangeAnnouncementStatus godoc
+// @Summary Change announcement status
+// @Description Change the status of an announcement by its ID
+// @Tags Announcements
+// @Param id path int true "Announcement ID"
+// @Param Authorization header string true "Bearer token"
+// @Success 200 {object} utils.AnnouncementSuccessResponse "Announcement status updated successfully"
+// @Failure 400 {object} utils.ErrorResponse "Invalid announcement ID or status value"
+// @Failure 404 {object} utils.ErrorResponse "Announcement not found"
+// @Failure 401 {object} utils.ErrorResponse "You are not allowed to update this announcement"
+// @Failure 500 {object} utils.ErrorResponse "Could not update announcement status"
+// @Router /announcements/{id}/status [patch]
+func ChangeAnnouncementStatus(context *gin.Context) {
+	id, err := strconv.ParseInt(context.Param("id"), 10, 64)
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid announcement ID"})
+		return
+	}
+
+	isAdmin := context.GetBool("isAdmin")
+	if isAdmin {
+		context.JSON(http.StatusForbidden, gin.H{"error": "You are not allowed to delete this announcement"})
+		return
+	}
+
+	status := context.PostForm("status")
+	if status == "" {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "status is required"})
+		return
+	}
+	statusVal, err := parseStatus(status)
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid status value"})
+		return
+	}
+	err = models.ChangeAnnouncementStatus(id, statusVal)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": "Could not update announcement status"})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"message": "Announcement status updated successfully"})
 }
