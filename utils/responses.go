@@ -25,3 +25,7 @@ type AnnouncementSuccessResponse struct {
 	Message string              `json:"message"`
 	Data    models.Announcement `json:"announcement"`
 }
+
+type DeleteSuccessResponse struct {
+	Message string `json:"message"`
+}

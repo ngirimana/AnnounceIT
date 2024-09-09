@@ -149,6 +149,182 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "delete": {
+                "description": "Deletes an existing announcement by its ID. The user must be the owner of the announcement to delete it.",
+                "tags": [
+                    "Announcements"
+                ],
+                "summary": "Delete an announcement",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Announcement ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Announcement deleted successfully",
+                        "schema": {
+                            "$ref": "#/definitions/utils.DeleteSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid announcement ID",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "You are not allowed to delete this announcement",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Announcement not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Could not delete announcement",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Updates an existing announcement by its ID. The user must be the owner of the announcement to update it.",
+                "tags": [
+                    "Announcements"
+                ],
+                "summary": "Update an announcement",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Announcement ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Update Announcement",
+                        "name": "announcement",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Announcement"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Announcement updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/utils.AnnouncementSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Could not parse request body",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "You are not allowed to update this announcement",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Announcement not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Could not update announcement",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/announcements/{id}/status": {
+            "patch": {
+                "description": "Change the status of an announcement by its ID",
+                "tags": [
+                    "Announcements"
+                ],
+                "summary": "Change announcement status",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Announcement ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Announcement status updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/utils.AnnouncementSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid announcement ID or status value",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "You are not allowed to update this announcement",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Announcement not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Could not update announcement status",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
             }
         },
         "/users/login": {
@@ -387,6 +563,14 @@ const docTemplate = `{
                 "announcement": {
                     "$ref": "#/definitions/models.Announcement"
                 },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "utils.DeleteSuccessResponse": {
+            "type": "object",
+            "properties": {
                 "message": {
                     "type": "string"
                 }
